@@ -135,7 +135,7 @@ EMAIL_HOST = 'smtp.gmail.com'  # SMTP server for sending emails.
 EMAIL_PORT = 587  # SMTP server port. Common ports are 587 (TLS), 465 (SSL), 25 (unencrypted).
 EMAIL_USE_TLS = True  # Enable TLS (Transport Layer Security).
 EMAIL_HOST_USER = 'bibmarkets@gmail.com'  # Your email address.
-EMAIL_HOST_PASSWORD = 'vslnaiaddetaejsr'  # Your email password.
+EMAIL_HOST_PASSWORD = ''  # Your email password.
 CONTACT_EMAIL = 'bibmarkets@gmail.com'
 
 
@@ -143,5 +143,5 @@ CONTACT_EMAIL = 'bibmarkets@gmail.com'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-KEY_ID = 'rzp_test_70vZ0Pj2voqTbj'
-KEY_SECRET = 'v8XjYcenzchlxEN4ZGAmioiN'
+KEY_ID = ''
+KEY_SECRET = ''
