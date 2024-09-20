@@ -1,0 +1,70 @@
+{% extends "courses/templates/courses/base.html" %}
+{% load custom_tags %}  <!-- Load the correct custom tag library -->
+
+{% block content %}
+{% load static %}
+
+<!-- Main Container -->
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Profile Edit Form -->
+            <div class="card shadow-lg p-4">
+                <h2 class="card-title text-center mb-4">Edit Your Profile</h2>
+
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="text-center mb-4">
+                        <!-- Profile Image -->
+                        <label for="profile_img_input">
+                            <img id="profile_img" src="{{ user.profile.profile_img.url|default_if_none:'static/media/default.jpg' }}" alt="User Image" class="rounded-circle img-thumbnail" width="150" style="cursor: pointer;">
+                        </label>
+                        <!-- Hidden File Input for Profile Image -->
+                        <input type="file" id="profile_img_input" name="profile_img" style="display: none;" accept="image/*" onchange="previewProfileImage(event)">
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label">Your Name</label>
+                        {% get_profile_name request.user as profile_name %}
+                        <input type="text" class="form-control" name="name" value="{{ profile_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label">Your Title</label>
+                        {% get_profile_title request.user as profile_title %}
+                        <input type="text" class="form-control" name="title" value="{{ profile_title }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_desc" class="form-label">Description</label>
+                        {% get_profile_desc request.user as profile_desc %}
+                        <input type="text" class="form-control" name="desc" value="{{ profile_desc }}">
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript to Preview Image -->
+<script>
+    function previewProfileImage(event) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function(){
+            const imgElement = document.getElementById('profile_img');
+            imgElement.src = reader.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+</script>
+
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+{% endblock %}

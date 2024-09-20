@@ -1,0 +1,84 @@
+{% extends "courses/templates/courses/base.html" %}
+{% load custom_tags %}
+
+{% block content %}
+{% load static %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm p-4 rounded" style="border: none;">
+                <h1 class="card-title text-center mb-4">Log In</h1>
+                {% if messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {% for message in messages %}
+                            <p class="mb-0">{{ message }}</p>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+                <form action="{% url 'login' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Username or Email</label>
+                        {{ form.username|add_class:"form-control form-control-lg" }}
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Password</label>
+                        {{ form.password|add_class:"form-control form-control-lg" }}
+                        {{ form.password.errors }}
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+                    </div>
+                    <p class="text-center">Want to forget password? <a href="{% url 'SendResetLink' %}">Forget Password</a></p>
+                    <p class="text-center">Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    /* Custom styles for login page */
+    .card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+    }
+
+    .card-title {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-control-lg {
+        border-radius: 8px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        font-size: 1.125rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004a99;
+    }
+
+    .alert-info {
+        border-radius: 8px;
+    }
+
+    .btn-close {
+        background: #007bff;
+    }
+</style>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+{% endblock %}

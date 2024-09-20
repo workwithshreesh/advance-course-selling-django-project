@@ -1,0 +1,115 @@
+{% extends "./base.html" %}
+{% load course_custome_tags %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+
+<style>
+/* Custom styles for the animated and colorful interface */
+.card {
+    transition: transform 0.4s, box-shadow 0.4s;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card .card-img-top {
+    transition: transform 0.4s ease-in-out;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+.card-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.card-text strong {
+    color: #ff6f61; /* Vibrant discount color */
+}
+
+.card-text del {
+    color: #999;
+}
+
+.card-footer {
+    background-color: #f9f9f9;
+    border-top: none;
+}
+
+.card-footer a {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.card-footer a.btn-primary {
+    background-color: #ff6f61; /* Button color */
+    color: #fff;
+    border: none;
+}
+
+.card-footer a.btn-primary:hover {
+    background-color: #e85748;
+    color: #fff;
+}
+
+.card-footer a.btn-secondary {
+    background-color: #2e86de; /* Secondary button color */
+    color: #fff;
+    border: none;
+}
+
+.card-footer a.btn-secondary:hover {
+    background-color: #1b4f72;
+    color: #fff;
+}
+</style>
+
+<div class="container mt-5 row gy-4">
+    {% for course in courses %}
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
+        <div class="card shadow-sm">
+            <img src="{{ course.course.thumbnail.url }}" class="card-img-top" alt="{{ course.course.name }} thumbnail">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ course.course.name }}</h5>
+                <p class="card-text mb-4">
+                    <strong>Save: {{ course.course.discount|percent }}</strong>
+                    <br>
+                    <span class="fs-6">
+                        <del>{{ course.course.price|rupee }}</del> &nbsp;
+                        {% cal_sellprice course.course.price course.course.discount as value %}
+                        <span>{{ value|rupee }}</span>
+                    </span>
+                </p>
+                <div class="mt-auto">
+                    <a href="/courses/course/{{ course.course.slug }}" class="btn btn-primary w-100">Start Course</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Add a scroll reveal animation effect
+    ScrollReveal().reveal('.card', {
+        distance: '50px',
+        duration: 800,
+        easing: 'ease-in-out',
+        origin: 'bottom',
+        interval: 200
+    });
+});
+</script>
+
+<!-- Include ScrollReveal library -->
+<script src="https://unpkg.com/scrollreveal"></script>
+
+{% endblock %}

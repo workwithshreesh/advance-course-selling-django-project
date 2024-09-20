@@ -1,0 +1,95 @@
+{% extends "./base.html" %}
+{% load course_custome_tags %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+
+<div class="container-fluid my-4">
+    <!-- Course Video and Sidebar -->
+    <div class="card shadow-lg p-3 mb-5 bg-body rounded">
+        <div class="row">
+            <!-- Video Player -->
+            <div class="col-lg-8 col-md-7 col-sm-12">
+                <div class="ratio ratio-16x9 mb-3 rounded overflow-hidden">
+                    <!-- Direct iframe embed without overlay -->
+                    <iframe class="rounded" src="https://www.youtube.com/embed/{{video.video_id}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <!-- Video List Sidebar -->
+            <div class="col-lg-4 col-md-5 col-sm-12">
+                <div class="list-group shadow-sm overflow-auto custom-scrollbar smooth-scroll" style="max-height: 450px;">
+                    {% is_enrolled request courses as enrolled %}
+                    {% for v in videos %}
+                    <a href="?lecture={{v.serial_number}}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center  {% if v == video %} active {% endif %}">
+                        <span class="text-truncate">{{ v.title }}</span>
+                        {% if enrolled %}
+                              <span class="badge bg-primary rounded-pill">▶️ Play</span>
+                        {% elif v.is_preview %}
+                              <span class="badge bg-primary rounded-pill">▶️ Play</span>
+                        {% else %}
+                              <span class="badge bg-primary rounded-pill">🔒 Lock</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+            <div class="col-lg-8 col-md-7 col-sm-12">
+                <!-- Enhanced Pagination of lectures next and preview-->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center animated-pagination">
+                        <li class="page-item"><a class="page-link" href="?lecture={{first_lecture}}">⏮️ First</a></li>
+                        <li class="page-item"><a class="page-link {% if not previous_lecture %} disabled {% endif %}" href="?lecture={{previous_lecture}}">⬅️ Previous</a></li>
+                        <li class="page-item"><a class="page-link {% if not next_lecture %} disabled {% endif %}" href="?lecture={{next_lecture}}">Next ➡️</a></li>
+                        <li class="page-item"><a class="page-link" href="?lecture={{last_lecture}}">Last ⏭️</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Course Details -->
+    <div class="card mb-4 shadow-sm fade-in">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-info-circle"></i> {{ courses.name }}</h5>
+            <p class="card-text">{{ courses.description }}</p>
+        </div>
+    </div>
+
+    <!--resources in of this course-->
+    {% if enrolled %}
+    <div class="card mb-4 shadow-sm fade-in">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-info-circle"></i> {{ courses.name }} Resource</h5>
+            <p class="card-text"><a href="{{ courses.resource.url }}">Click</a></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Course Prerequisites -->
+    <div class="card mb-4 shadow-sm fade-in">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-bookmark-check"></i> Prerequisites</h5>
+            <ol class="list-group list-group-numbered">
+                {% for pre in courses.prerequisite_set.all %}
+                <li class="list-group-item">{{ pre.description }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <!-- Course Learnings -->
+    <div class="card mb-4 shadow-sm fade-in">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-award"></i> Learnings</h5>
+            <ol class="list-group list-group-numbered">
+                {% for learn in courses.learning_set.all %}
+                <li class="list-group-item">{{ learn.description }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

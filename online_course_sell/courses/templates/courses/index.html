@@ -1,0 +1,54 @@
+{% extends "./base.html" %}
+{% load course_custome_tags %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row mt-4">
+        <!-- Courses Loop -->
+        {% for course in courses %}
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
+            <div class="card" style="width: 100%;">
+                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.name }} thumbnail">
+                <div class="card-body">
+                    <h5 class="card-title">{{ course.name }}</h5>
+                    <p class="card-text">
+                        <strong>Save: {{ course.discount|percent }}</strong>
+                        <br>
+                        <span class="fs-6">
+                            <del>{{ course.price|rupee }}</del> &nbsp;
+                            {% cal_sellprice course.price course.discount as value %}
+                            <span>{{ value|rupee }}</span>
+                        </span>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    {% is_enrolled request course as enrolled %}
+                    {% if enrolled %}
+                    <div class="d-flex justify-content-between">
+                        <a href="/courses/course/{{ course.slug }}" class="btn btn-primary flex-fill me-1">Start Course</a>
+                    </div>
+                    {% elif value == 0 %}
+                    <div class="d-flex justify-content-between">
+                        <a href="/courses/check_out_free/{{ course.slug }}" class="btn btn-primary flex-fill me-1">Enroll Free</a>
+                        <a href="/courses/course/{{ course.slug }}" class="btn btn-secondary flex-fill ms-1">Show More</a>
+                    </div>
+                    {% else %}
+                    <div class="d-flex justify-content-between">
+                        <a href="/courses/check-out/{{ course.slug }}" class="btn btn-primary flex-fill me-1">Enroll Now</a>
+                        <a href="/courses/course/{{ course.slug }}" class="btn btn-secondary flex-fill ms-1">Show More</a>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No courses available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

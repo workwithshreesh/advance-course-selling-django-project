@@ -1,0 +1,202 @@
+{% extends "./base.html" %}
+{% load course_custome_tags %}
+{% block title %}Checkout Page{% endblock %}
+{% block content %}
+
+<!-- Checkout Page Content -->
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">Checkout</h1>
+        <p class="lead text-muted">Review your course details and proceed to payment.</p>
+    </div>
+    <hr>
+
+    <!-- Course and Payment Summary -->
+    <div class="row g-4">
+        <!-- Course Details -->
+        <div class="col-lg-5">
+            <div class="card h-100 shadow border-0">
+                <img src="{{courses.thumbnail.url}}" class="card-img-top rounded-top" alt="Course Thumbnail">
+                <div class="card-body">
+                    <h3 class="card-title text-dark">{{courses.name}}</h3>
+                    <p class="card-text text-muted">
+                        <strong class="text-success">Save: {{courses.discount|percent}}</strong><br>
+                        <span class="text-muted fs-5">
+                            <del>{{courses.price|rupee}}</del> &nbsp;
+                            <span class="text-dark fw-bold">{% cal_sellprice courses.price courses.discount as value %}
+                                <span>{{ value|rupee }}</span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="col-lg-7">
+            <div class="card h-100 shadow border-0 p-4">
+                <div class="card-body">
+                    <h3 class="card-title text-dark text-center">Payment Summary</h3>
+                    <hr>
+                    <form action="" method="get">
+                        <!-- Coupon Code Input -->
+                    <div class="input-group mb-3 animated-coupon">
+                        <input type="text" class="form-control" name="couponcode" id="couponCodeInput" placeholder="Enter Coupon Code" aria-label="Coupon Code" aria-describedby="applyCouponButton">
+                        <button class="btn btn-outline-primary" type="submit" id="applyCouponButton">Apply</button>
+                    </div>
+                    <!-- Coupon Status Message -->
+                     {% if coupon_code_message %}
+                    <p id="couponStatusMessage" class="text-center mt-3 alert alert-light">{{coupon_code_message}}</p>
+                    {% endif %}
+                    </form>
+                    <hr>
+                    <p class="display-6 text-center text-primary">Total Payable Amount</p>
+                    {% if cupon %}
+                    <p class="display-4 text-center fw-bold text-success" id="totalPayableAmount">{% cal_sellprice courses.price cupon.discount as value %}
+                        <span>{{ value|rupee }}</span></p>
+                        <div class="text-center mt-4">
+                            <a class="btn btn-primary btn-lg px-5 py-3 shadow-lg" href="?action=create_payment&couponcode={{cupon.code}}">Proceed to Payment</a>
+                        </div>
+                    {%else%}
+                    <p class="display-4 text-center fw-bold text-success" id="totalPayableAmount">{% cal_sellprice courses.price courses.discount as value %}
+                        <span>{{ value|rupee }}</span></p>
+                        <div class="text-center mt-4">
+                            <a class="btn btn-primary btn-lg px-5 py-3 shadow-lg" href="?action=create_payment">Proceed to Payment</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Success Message -->
+    <!-- <div class="alert alert-success mt-5 text-center d-none" id="paymentSuccessMessage">
+        <h4 class="alert-heading">Payment Successful!</h4>
+        <p>Thank you for your purchase. You can now access the course in your dashboard.</p>
+    </div> -->
+</div>
+
+<!-- JavaScript for Payment Simulation and Coupon Code Application -->
+{% if order is not None %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_70vZ0Pj2voqTbj",
+    "amount": "{{order.amount}}",
+    "currency": "INR",
+    "name": "webname",
+    "description": "Payment for {{courses.name}}",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{order.id}}",
+    "callback_url": "http://127.0.0.1:8000/courses/verify_payment",
+    "prefill": {
+        "name": "{{user.first_name}}",
+        "email": "{{user.email}}"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.open();
+</script>
+{% endif %}
+
+{% if error is not None %}
+<script>
+    alert("{{error}}")
+</script>
+{% endif %}
+
+<!-- JavaScript for Applying Coupon Code -->
+{% comment %} <script>
+document.getElementById('applyCouponButton').addEventListener('click', function() {
+    const couponCode = document.getElementById('couponCodeInput').value;
+    const statusMessage = document.getElementById('couponStatusMessage');
+    const totalPayableAmountElement = document.getElementById('totalPayableAmount');
+    const originalAmount = parseFloat('{{ value }}'); // Store the original amount before any coupon is applied
+    
+    // Dummy Coupon Code Application Logic
+    if (couponCode === '{{courses.coupons.code}}') {
+        statusMessage.textContent = 'Coupon Applied! You get a 50% discount!';
+        statusMessage.classList.remove('text-danger');
+        statusMessage.classList.add('text-success', 'fade-in');
+
+        // Update the total payable amount
+        const newAmount = parseFloat('{{ value }}') / 2;  // 50% discount
+        totalPayableAmountElement.innerHTML = newAmount.toLocaleString('en-IN', {style: 'currency', currency: 'INR'});
+    } else if (couponCode === '') {
+        statusMessage.textContent = 'Coupon removed. Original price restored.';
+        statusMessage.classList.remove('text-danger', 'text-success');
+        statusMessage.classList.add('text-muted', 'fade-in');
+
+        // Restore the original amount
+        totalPayableAmountElement.innerHTML = originalAmount.toLocaleString('en-IN', {style: 'currency', currency: 'INR'});
+    } else {
+        statusMessage.textContent = 'Invalid Coupon Code. Please try again!';
+        statusMessage.classList.remove('text-success');
+        statusMessage.classList.add('text-danger', 'fade-in');
+
+        // Restore the original amount for invalid coupon
+        totalPayableAmountElement.innerHTML = originalAmount.toLocaleString('en-IN', {style: 'currency', currency: 'INR'});
+    }
+});
+</script> {% endcomment %}
+
+<!-- Custom Styles -->
+<style>
+    body {
+        background-color: #f4f7fc;
+    }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .animated-coupon {
+        transition: box-shadow 0.3s ease;
+    }
+
+    .animated-coupon:focus-within {
+        box-shadow: 0 0 10px 5px rgba(0, 123, 255, 0.25);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert {
+        animation: fadeIn 1s forwards;
+    }
+</style>
+
+{% endblock %}
